@@ -1,0 +1,49 @@
+#include <SPI.h>
+#include <RF24.h>
+
+RF24 radio(9, 10); // CE, CSN
+const byte address[6] = "Node1";
+
+int Rpin = 9;
+int Gpin = 10;
+int Bpin = 11;
+
+void setRGB(int r, int g, int b) {
+  analogWrite(Rpin, r);
+  analogWrite(Gpin, g);
+  analogWrite(Bpin, b);
+}
+
+void setup() {
+  Serial.begin(9600);
+
+  pinMode(Rpin, OUTPUT);
+  pinMode(Gpin, OUTPUT);
+  pinMode(Bpin, OUTPUT);
+
+  setRGB(0,0,0);
+
+  radio.begin();
+  radio.openReadingPipe(0, address);
+  radio.setPALevel(RF24_PA_MIN);
+  radio.startListening(); // 수신 모드
+}
+
+void loop() {
+  if (radio.available()) {
+    char recvData;
+    radio.read(&recvData, sizeof(recvData));
+
+    Serial.print("수신 데이터: ");
+    Serial.println(recvData);
+
+    if (recvData == '1') {
+      // 압력 감지 → LED 빨간색 ON
+      setRGB(255, 0, 0);
+    }
+    else if (recvData == '0') {
+      // 압력 없음 → LED OFF
+      setRGB(0, 0, 0);
+    }
+  }
+}
