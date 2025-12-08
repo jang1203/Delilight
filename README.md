@@ -1,1 +1,35 @@
-# Delilight
+#include <SPI.h>
+#include <RF24.h>
+
+RF24 radio(9, 10); // CE, CSN
+const byte address[6] = "Node1";
+
+int sensorPin = A0;
+int threshold = 300;  // 압력센서 기준값 (테스트 후 수정)
+
+void setup() {
+  Serial.begin(9600);
+
+  radio.begin();
+  radio.openWritingPipe(address); 
+  radio.setPALevel(RF24_PA_MIN);
+  radio.stopListening(); // 송신 모드
+}
+
+void loop() {
+  int value = analogRead(sensorPin);
+  Serial.println(value);
+
+  char sendData;
+
+  if (value > threshold) {
+    sendData = '1';  // 무게 감지
+  } else {
+    sendData = '0';  // 미감지
+  }
+
+  radio.write(&sendData, sizeof(sendData));
+
+  delay(300);
+}
+
