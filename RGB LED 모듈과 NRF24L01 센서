@@ -4,9 +4,9 @@
 RF24 radio(7, 8); // CE, CSN
 const byte address[6] = "Node1";
 
-int Rpin = 9;
-int Gpin = 10;
-int Bpin = 11;
+int Rpin = 2;
+int Gpin = 3;
+int Bpin = 4;
 
 void setRGB(int r, int g, int b) {
   analogWrite(Rpin, r);
